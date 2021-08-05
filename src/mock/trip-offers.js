@@ -2,25 +2,26 @@ import { getRandomInteger } from '../utils';
 
 const tripTypes = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
-const generateTripOffer = () => {
+const tripOffers = [];
+
+export const generateTripOffer = () => {
   const offersTemplates = [];
-  for (let i = 0; i < getRandomInteger(0, 5); i++) {
+  const offersCount = getRandomInteger(0, 5);
+
+  for (let i = 0; i < offersCount; i++) {
     const offer = {
       'title': 'Add offer',
       'price': getRandomInteger(10, 300),
     };
     offersTemplates.push(offer);
   }
-  return offersTemplates;
-};
 
-const tripOffers = [];
-
-tripTypes.forEach((el) => {
-  tripOffers.push({
-    'type': el,
-    'offers': generateTripOffer(),
+  tripTypes.forEach((el) => {
+    tripOffers.push({
+      'type': el,
+      'offers': offersTemplates,
+    });
   });
-});
 
-export {tripOffers};
+  return tripOffers;
+};

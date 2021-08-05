@@ -1,5 +1,80 @@
 import dayjs from 'dayjs';
 
+const generatePointTypeTemplate = (type, destination) => (
+  `<div class="event__field-group  event__field-group--destination">
+      <label class="event__label  event__type-output" for="event-destination-1">
+        ${type}
+      </label>
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+      <datalist id="destination-list-1">
+        <option value="Amsterdam"></option>
+        <option value="Geneva"></option>
+        <option value="Chamonix"></option>
+      </datalist>
+    </div>`
+);
+
+const generatePointPriceTemplate = (basePrice) => (
+  `<div class="event__field-group  event__field-group--price">
+  <label class="event__label" for="event-price-1">
+    <span class="visually-hidden">Price</span>
+    &euro;
+  </label>
+  <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+</div>`
+);
+
+const generateOffersTemplate = (offers) => {
+  let offersTemplate = '';
+  for (let i = 0; i < offers.length; i++) {
+    offersTemplate += `<div class="event__offer-selector">
+    <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal">
+    <label class="event__offer-label" for="event-offer-meal-1">
+      <span class="event__offer-title">${offers[i].title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${offers[i].price}</span>
+    </label>
+  </div> `;
+  }
+
+  return offers.length > 0 ? `
+  <section class="event__section  event__section--offers">
+    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+      <div class="event__available-offers">
+      ${offersTemplate}
+      </div>
+  </section>` : '';
+};
+
+const generatePhotosTemplate = (destination) => {
+  let photosTemplate = '<div class="event__photos-container"><div class="event__photos-tape">';
+  for (let i = 0; i < destination.pictures.length; i++) {
+    photosTemplate += `
+      <img class="event__photo" src="${destination.pictures[i].src}" alt="Event photo">`;
+  }
+  photosTemplate += '</div></div>';
+  return photosTemplate;
+};
+
+const generateEditingDateTemplate = (dateFrom, dateTo) => (
+  `<div class="event__field-group  event__field-group--time">
+  <label class="visually-hidden" for="event-start-time-1">From</label>
+  <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(dateFrom).format('DD/MM/YY HH:mm')}">
+  &mdash;
+  <label class="visually-hidden" for="event-end-time-1">To</label>
+  <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(dateTo).format('DD/MM/YY HH:mm')}">
+</div>`
+);
+
+const generateDestinationTemplate = (destination) => (
+  `${destination.description !== '' ? `<section class="event__section  event__section--destination">
+  <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+  <p class="event__destination-description">${destination.description}</p>
+  ${destination.pictures.length > 0 ? generatePhotosTemplate(destination) : ''}
+</section>` : ''}`
+);
+
+
 export const createEditingEventFormTemplate = (tripPoint = {}) => {
   const stockDestination = {
     'description': 'It could be a description',
@@ -30,84 +105,14 @@ export const createEditingEventFormTemplate = (tripPoint = {}) => {
     },
   ];
 
-  const { destination = stockDestination,
+  const {
+    destination = stockDestination,
     type = 'taxi',
     basePrice = 1000,
     dateTo = dayjs().toDate(),
     dateFrom = dayjs().toDate(),
-    offers = stockOffer } = tripPoint;
-
-  const generatePointTypeTemplate = () => (
-    `<div class="event__field-group  event__field-group--destination">
-        <label class="event__label  event__type-output" for="event-destination-1">
-          ${type}
-        </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
-        <datalist id="destination-list-1">
-          <option value="Amsterdam"></option>
-          <option value="Geneva"></option>
-          <option value="Chamonix"></option>
-        </datalist>
-      </div>`
-  );
-
-  const generatePointPriceTemplate = () => (
-    `<div class="event__field-group  event__field-group--price">
-    <label class="event__label" for="event-price-1">
-      <span class="visually-hidden">Price</span>
-      &euro;
-    </label>
-    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
-  </div>`
-  );
-
-  const generateOffersTemplate = () => {
-    let offersTemplate = '';
-    for (let i = 0; i < offers.length; i++) {
-      offersTemplate += `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal">
-      <label class="event__offer-label" for="event-offer-meal-1">
-        <span class="event__offer-title">${offers[i].title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offers[i].price}</span>
-      </label>
-    </div> `;
-    }
-
-    return offers.length > 0 ? `
-    <section class="event__section  event__section--offers">
-      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-        <div class="event__available-offers">
-        ${offersTemplate}
-        </div>
-    </section>` : '';
-  };
-
-  const generatePhotosTemplate = () => {
-    let photosTemplate = '<div class="event__photos-container"><div class="event__photos-tape">';
-    for (let i = 0; i < destination.pictures.length; i++) {
-      photosTemplate += `
-        <img class="event__photo" src="${destination.pictures[i].src}" alt="Event photo">`;
-    }
-    photosTemplate += '</div></div>';
-    return photosTemplate;
-  };
-
-  const generateEditingDateTemplate = () => (`<div class="event__field-group  event__field-group--time">
-    <label class="visually-hidden" for="event-start-time-1">From</label>
-    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(dateFrom).format('DD/MM/YY HH:mm')}">
-    &mdash;
-    <label class="visually-hidden" for="event-end-time-1">To</label>
-    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(dateTo).format('DD/MM/YY HH:mm')}">
-  </div>`);
-
-  const generateDestinationTemplate = () => (
-    `${destination.description !== '' ? `<section class="event__section  event__section--destination">
-    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-    <p class="event__destination-description">${destination.description}</p>
-    ${destination.pictures.length > 0 ? generatePhotosTemplate() : ''}
-  </section>` : ''}`
-  );
+    offers = stockOffer,
+  } = tripPoint;
 
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
@@ -176,11 +181,11 @@ export const createEditingEventFormTemplate = (tripPoint = {}) => {
         </div>
       </div>
 
-      ${generatePointTypeTemplate()}
+      ${generatePointTypeTemplate(type, destination)}
 
-      ${generateEditingDateTemplate()}
+      ${generateEditingDateTemplate(dateFrom, dateTo)}
 
-      ${generatePointPriceTemplate()}
+      ${generatePointPriceTemplate(basePrice)}
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Delete</button>
@@ -189,8 +194,8 @@ export const createEditingEventFormTemplate = (tripPoint = {}) => {
       </button>
     </header>
     <section class="event__details">
-    ${generateOffersTemplate()}
-    ${generateDestinationTemplate()}
+    ${generateOffersTemplate(offers)}
+    ${generateDestinationTemplate(destination)}
     </section>
   </form>
 </li>`;
