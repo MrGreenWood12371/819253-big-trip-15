@@ -13,28 +13,28 @@ const POINTS_COUNT = 20;
 
 const tripPoints = new Array(POINTS_COUNT).fill().map(generateTripPoint);
 
-const renderPoint = (position, tripPoint) => {
+const renderPoint = (element, tripPoint) => {
   const tripPointComponent = new TripPointView(tripPoint);
-  const EditingEventFormComponent = new EditingEventFormView(tripPoint);
+  const editingEventFormComponent = new EditingEventFormView(tripPoint);
 
   const replaceCardToForm = () => {
-    position.replaceChild(EditingEventFormComponent.getElement(), tripPointComponent.getElement());
+    element.replaceChild(editingEventFormComponent.getElement(), tripPointComponent.getElement());
   };
 
   const replaceFormToCard = () => {
-    position.replaceChild(tripPointComponent.getElement(), EditingEventFormComponent.getElement());
+    element.replaceChild(tripPointComponent.getElement(), editingEventFormComponent.getElement());
   };
 
   tripPointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
     replaceCardToForm();
   });
 
-  EditingEventFormComponent.getElement().querySelector('form').addEventListener('submit', (evt) => {
+  editingEventFormComponent.getElement().querySelector('form').addEventListener('submit', (evt) => {
     evt.preventDefault();
     replaceFormToCard();
   });
 
-  render(position, tripPointComponent.getElement(), RenderPosition.BEFOREEND);
+  render(element, tripPointComponent.getElement(), RenderPosition.BEFOREEND);
 };
 
 const siteHeaderElement = document.querySelector('.trip-main');

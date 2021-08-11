@@ -1,39 +1,6 @@
 import dayjs from 'dayjs';
 import { createElement } from '../utils';
-
-const STOCK_TASK = {
-  'destination' : {
-    'description': 'It could be a description',
-    'name': 'Moscow',
-    'pictures': [
-      {
-        'src': `http://picsum.photos/300/200?r=${Math.random()}`,
-        'description': 'Fusce tristique felis at fermentum pharetra.',
-      },
-      {
-        'src': `http://picsum.photos/300/200?r=${Math.random()}`,
-        'description': 'Fusce tristique felis at fermentum pharetra.',
-      },
-      {
-        'src': `http://picsum.photos/300/200?r=${Math.random()}`,
-        'description': 'Fusce tristique felis at fermentum pharetra.',
-      },
-    ],
-  },
-  'type' : 'taxi',
-  'basePrice' : 1000,
-  'dateTo' : dayjs().toDate(),
-  'dateFrom' : dayjs().toDate(),
-  'offers' : [
-    {
-      'title': 'Upgrade to a business class',
-      'price': 120,
-    }, {
-      'title': 'Choose the radio station',
-      'price': 60,
-    },
-  ],
-};
+import { stockTask } from '../mock/stock-task';
 
 const generatePointTypeTemplate = (type, destination) => (
   `<div class="event__field-group  event__field-group--destination">
@@ -208,7 +175,7 @@ const createEditingEventFormTemplate = (tripPoint) => {
 };
 
 export default class EditingEventForm {
-  constructor (tripPoint = STOCK_TASK) {
+  constructor (tripPoint = stockTask) {
     this._tripPoint = tripPoint;
     this._element = null;
   }
