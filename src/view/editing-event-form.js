@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import { createElement } from '../utils';
+import { stockTask } from '../mock/stock-task';
 
 const generatePointTypeTemplate = (type, destination) => (
   `<div class="event__field-group  event__field-group--destination">
@@ -74,44 +76,15 @@ const generateDestinationTemplate = (destination) => (
 </section>` : ''}`
 );
 
-
-export const createEditingEventFormTemplate = (tripPoint = {}) => {
-  const stockDestination = {
-    'description': 'It could be a description',
-    'name': 'Moscow',
-    'pictures': [
-      {
-        'src': `http://picsum.photos/300/200?r=${Math.random()}`,
-        'description': 'Fusce tristique felis at fermentum pharetra.',
-      },
-      {
-        'src': `http://picsum.photos/300/200?r=${Math.random()}`,
-        'description': 'Fusce tristique felis at fermentum pharetra.',
-      },
-      {
-        'src': `http://picsum.photos/300/200?r=${Math.random()}`,
-        'description': 'Fusce tristique felis at fermentum pharetra.',
-      },
-    ],
-  };
-
-  const stockOffer = [
-    {
-      'title': 'Upgrade to a business class',
-      'price': 120,
-    }, {
-      'title': 'Choose the radio station',
-      'price': 60,
-    },
-  ];
+const createEditingEventFormTemplate = (tripPoint) => {
 
   const {
-    destination = stockDestination,
-    type = 'taxi',
-    basePrice = 1000,
+    destination,
+    type,
+    basePrice,
     dateTo = dayjs().toDate(),
     dateFrom = dayjs().toDate(),
-    offers = stockOffer,
+    offers,
   } = tripPoint;
 
   return `<li class="trip-events__item">
@@ -200,3 +173,26 @@ export const createEditingEventFormTemplate = (tripPoint = {}) => {
   </form>
 </li>`;
 };
+
+export default class EditingEventForm {
+  constructor (tripPoint = stockTask) {
+    this._tripPoint = tripPoint;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEditingEventFormTemplate(this._tripPoint);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
