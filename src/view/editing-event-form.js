@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { createElement } from '../utils';
+import AbstractView from './abstract';
 import { stockTask } from '../mock/stock-task';
 
 const generatePointTypeTemplate = (type, destination) => (
@@ -174,25 +174,36 @@ const createEditingEventFormTemplate = (tripPoint) => {
 </li>`;
 };
 
-export default class EditingEventForm {
+export default class EditingEventForm extends AbstractView {
   constructor (tripPoint = stockTask) {
+    super();
     this._tripPoint = tripPoint;
-    this._element = null;
+
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._editClickHandler = this._editClickHandler.bind(this);
   }
 
   getTemplate() {
     return createEditingEventFormTemplate(this._tripPoint);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _editClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.editClick();
   }
 
-  removeElement() {
-    this._element = null;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
+  }
+
+  setEditFormClickHandler(callback) {
+    this._callback.editClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
   }
 }
