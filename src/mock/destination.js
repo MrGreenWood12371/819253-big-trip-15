@@ -1,4 +1,4 @@
-import { getRandomInteger } from '../utils';
+import { getRandomInteger } from '../utils/common';
 
 const descriptions = ['Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',

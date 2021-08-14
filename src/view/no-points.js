@@ -1,26 +1,14 @@
-import { createElement } from '../utils';
+import AbstractView from './abstract';
 
 const createNoTripPointsTemplate = (text) => `<p class="trip-events__msg">${text}</p>`;
 
-export default class NoTripPoints {
+export default class NoTripPoints extends AbstractView {
   constructor (text) {
-    this._element = null;
+    super();
     this._text = text;
   }
 
   getTemplate() {
     return createNoTripPointsTemplate(this._text);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

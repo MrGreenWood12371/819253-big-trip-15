@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { createElement } from '../utils';
+import AbstractView from './abstract';
 
 const createTripPointTemplate = (tripPoint) => {
   const {destination, type, basePrice, isFavorite, dateTo, dateFrom} = tripPoint;
@@ -13,9 +13,9 @@ const createTripPointTemplate = (tripPoint) => {
     <h3 class="event__title">${type} ${destination.name}</h3>
     <div class="event__schedule">
       <p class="event__time">
-        <time class="event__start-time" datetime="2019-03-18T10:30">${dayjs(dateFrom).format('H:m')}</time>
+        <time class="event__start-time" datetime="2019-03-18T10:30">${dayjs(dateFrom).format('H:mm')}</time>
         &mdash;
-        <time class="event__end-time" datetime="2019-03-18T11:00">${dayjs(dateTo).format('H:m')}</time>
+        <time class="event__end-time" datetime="2019-03-18T11:00">${dayjs(dateTo).format('H:mm')}</time>
       </p>
       <p class="event__duration">${dayjs(dateTo).diff(dayjs(dateFrom), 'm')}M</p>
     </div>
@@ -43,25 +43,25 @@ const createTripPointTemplate = (tripPoint) => {
 </li>`;
 };
 
-export default class TripPoint {
+export default class TripPoint extends AbstractView {
   constructor (tripPoint) {
+    super();
     this._tripPoint = tripPoint;
-    this._element = null;
+
+    this._editClickHandler = this._editClickHandler.bind(this);
   }
 
   getTemplate() {
     return createTripPointTemplate(this._tripPoint);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _editClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.editClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setEditClickHandler(callback) {
+    this._callback.editClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
   }
 }

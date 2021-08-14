@@ -1,4 +1,4 @@
-import { getRandomInteger } from '../utils';
+import { getRandomInteger } from '../utils/common';
 
 const tripTypes = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 

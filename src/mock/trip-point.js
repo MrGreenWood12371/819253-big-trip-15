@@ -1,4 +1,4 @@
-import { getRandomInteger } from '../utils';
+import { getRandomInteger } from '../utils/common';
 import { generateDestination } from './destination';
 import { generateTripOffer } from './trip-offers';
 import dayjs from 'dayjs';
