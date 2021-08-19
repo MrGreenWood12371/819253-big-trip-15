@@ -2,6 +2,7 @@ import { getRandomInteger } from '../utils/common';
 import { generateDestination } from './destination';
 import { generateTripOffer } from './trip-offers';
 import dayjs from 'dayjs';
+import { nanoid } from 'nanoid';
 
 const tripTypes = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
@@ -18,5 +19,6 @@ export const generateTripPoint = () => {
     'isFavorite': !!getRandomInteger(0, 1),
     'offers': generateTripOffer().filter((item) => item.type === tripType)[0].offers,
     'type': tripType,
+    'id': nanoid(),
   };
 };
