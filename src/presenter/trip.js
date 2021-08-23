@@ -5,6 +5,8 @@ import MainContentView from '../view/main-content';
 import TripRoadInfoView from '../view/trip-road-info';
 import TripPriceView from '../view/trip-price';
 import PointPresenter from './point';
+import { SortType } from '../const';
+import { sortTripPointByDay, sortTripPointByPrice, sortTripPointByTime } from '../utils/trip-point';
 import { render, RenderPosition } from '../utils/render';
 import { updateItem } from '../utils/common';
 
@@ -18,6 +20,7 @@ export default class Trip {
   constructor(tripListContainer) {
     this._tripListContainer = tripListContainer;
     this._pointPresenter = new Map();
+    this._currentSortType = SortType.DATE;
 
     this._noTripPointComponent = new NoTripPointsView();
     this._eventsComponent = new EventsView();
@@ -26,10 +29,12 @@ export default class Trip {
 
     this._handleTripPointChange = this._handleTripPointChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(tripPoints, infoElement) {
-    this._tripPoints = tripPoints.slice();
+    this._tripPoints = tripPoints.slice().sort(sortTripPointByDay);
+    this._defaultTripPoints = tripPoints.slice().sort(sortTripPointByDay);
     this._TripPriceComponent = new TripPriceView(this._tripPoints);
     this._TripRoadInfoComponent = new TripRoadInfoView(this._tripPoints);
 
@@ -45,7 +50,34 @@ export default class Trip {
 
   _handleTripPointChange(updatedTripPoint) {
     this._tripPoints = updateItem(this._tripPoints, updatedTripPoint);
+    this._defaultTripPoints = updateItem(this._defaultTripPoints, updatedTripPoint);
     this._pointPresenter.get(updatedTripPoint.id).init(updatedTripPoint);
+  }
+
+  _sortTasks(sortType) {
+    switch (sortType) {
+      case SortType.DAY:
+        this._tripPoints = this._defaultTripPoints.slice();
+        break;
+      case SortType.TIME:
+        this._tripPoints.sort(sortTripPointByTime);
+        break;
+      case SortType.PRICE:
+        this._tripPoints.sort(sortTripPointByPrice);
+        break;
+    }
+
+    this._currentSortType = sortType;
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._sortTasks(sortType);
+    this._clearTripPoints();
+    this._renderTripPoints();
   }
 
   _renderInfo(infoElement) {
@@ -73,6 +105,7 @@ export default class Trip {
 
   _renderTripSortingForm() {
     render(this._mainContentCocmponent, this._tripSortingFormComponent, RenderPosition.BEFOREEND);
+    this._tripSortingFormComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderNoTripPoints() {

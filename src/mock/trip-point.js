@@ -13,7 +13,7 @@ export const generateTripPoint = () => {
 
   return {
     'basePrice': getRandomInteger(100, 3000),
-    'dateFrom': dayjs().toDate(),
+    'dateFrom': dayjs().add(getRandomInteger(-6, 0), 'day').toDate(),
     'dateTo': dayjs().add(getRandomInteger(0, 6), 'day').toDate(),
     'destination': generateDestination(),
     'isFavorite': !!getRandomInteger(0, 1),
