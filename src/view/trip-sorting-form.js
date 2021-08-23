@@ -48,6 +48,13 @@ export default class TripSortingForm extends AbstractView{
 
     evt.preventDefault();
     this._callback.sortTypeChange(evt.target.dataset.sortType);
+
+    const sortSelectors = document.querySelectorAll('#sort-day, #sort-time, #sort-price');
+    sortSelectors.forEach((selector) => {
+      if (selector.labels[0].dataset.sortType === evt.target.dataset.sortType) {
+        selector.checked = true;
+      }
+    });
   }
 
   setSortTypeChangeHandler(callback) {

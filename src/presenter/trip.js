@@ -75,11 +75,6 @@ export default class Trip {
       return;
     }
 
-    const sortSelectors = document.querySelectorAll('#sort-day, #sort-time, #sort-price');
-    sortSelectors.forEach((selector) => {
-      selector.labels[0].dataset.sortType === sortType ? selector.checked = true : selector.checked = false;
-    });
-
     this._sortTasks(sortType);
     this._clearTripPoints();
     this._renderTripPoints();
