@@ -1,6 +1,8 @@
 import dayjs from 'dayjs';
-import AbstractView from './abstract';
-import { stockTask } from '../mock/stock-task';
+import SmartView from './smart';
+import { generateDestination } from '../mock/destination';
+import { generateTripOffer } from '../mock/trip-offers';
+import { stockPoint } from '../mock/stock-point';
 
 const generatePointTypeTemplate = (type, destination) => (
   `<div class="event__field-group  event__field-group--destination">
@@ -26,12 +28,12 @@ const generatePointPriceTemplate = (basePrice) => (
 </div>`
 );
 
-const generateOffersTemplate = (offers) => {
+const generateOffersTemplate = (offers, isOffers) => {
   let offersTemplate = '';
   for (let i = 0; i < offers.length; i++) {
     offersTemplate += `<div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal">
-    <label class="event__offer-label" for="event-offer-meal-1">
+    <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offers[i].name}-1" type="checkbox" name="event-offer-${offers[i].name}">
+    <label class="event__offer-label" for="event-offer-${offers[i].name}-1">
       <span class="event__offer-title">${offers[i].title}</span>
       &plus;&euro;&nbsp;
       <span class="event__offer-price">${offers[i].price}</span>
@@ -39,7 +41,7 @@ const generateOffersTemplate = (offers) => {
   </div> `;
   }
 
-  return offers.length > 0 ? `
+  return isOffers ? `
   <section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
@@ -68,15 +70,15 @@ const generateEditingDateTemplate = (dateFrom, dateTo) => (
 </div>`
 );
 
-const generateDestinationTemplate = (destination) => (
-  `${destination.description !== '' ? `<section class="event__section  event__section--destination">
+const generateDestinationTemplate = (destination, isDestinationDescription, isDestinationPictures) => (
+  `${isDestinationDescription ? `<section class="event__section  event__section--destination">
   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
   <p class="event__destination-description">${destination.description}</p>
-  ${destination.pictures.length > 0 ? generatePhotosTemplate(destination) : ''}
+  ${isDestinationPictures ? generatePhotosTemplate(destination) : ''}
 </section>` : ''}`
 );
 
-const createEditingEventFormTemplate = (tripPoint) => {
+const createEditingEventFormTemplate = (data) => {
 
   const {
     destination,
@@ -85,7 +87,10 @@ const createEditingEventFormTemplate = (tripPoint) => {
     dateTo = dayjs().toDate(),
     dateFrom = dayjs().toDate(),
     offers,
-  } = tripPoint;
+    isOffers,
+    isDestinationDescription,
+    isDestinationPictures,
+  } = data;
 
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
@@ -132,7 +137,7 @@ const createEditingEventFormTemplate = (tripPoint) => {
             </div>
 
             <div class="event__type-item">
-              <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
+              <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight">
               <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
             </div>
 
@@ -167,24 +172,28 @@ const createEditingEventFormTemplate = (tripPoint) => {
       </button>
     </header>
     <section class="event__details">
-    ${generateOffersTemplate(offers)}
-    ${generateDestinationTemplate(destination)}
+    ${generateOffersTemplate(offers, isOffers)}
+    ${generateDestinationTemplate(destination, isDestinationDescription, isDestinationPictures)}
     </section>
   </form>
 </li>`;
 };
 
-export default class EditingEventForm extends AbstractView {
-  constructor (tripPoint = stockTask) {
+export default class EditingEventForm extends SmartView {
+  constructor(tripPoint = stockPoint) {
     super();
-    this._tripPoint = tripPoint;
+    this._data = EditingEventForm.parsePointToData(tripPoint);
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._editClickHandler = this._editClickHandler.bind(this);
+    this._tripTypeChangeHandler = this._tripTypeChangeHandler.bind(this);
+    this._tripDestinationChangeHandler = this._tripDestinationChangeHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
-    return createEditingEventFormTemplate(this._tripPoint);
+    return createEditingEventFormTemplate(this._data);
   }
 
   _editClickHandler(evt) {
@@ -194,7 +203,32 @@ export default class EditingEventForm extends AbstractView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(this._data);
+  }
+
+  _tripTypeChangeHandler(evt) {
+    evt.preventDefault();
+    const newOffers = generateTripOffer().filter((item) => item.type === evt.target.value)[0].offers;
+
+    this.updateData({
+      type: evt.target.value,
+      offers: newOffers,
+      isOffers: newOffers.length > 0,
+    });
+    this.getElement().querySelector(`#event-type-${evt.target.value}-1`).checked = true;
+  }
+
+  _tripDestinationChangeHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      destination: generateDestination(evt.target.value),
+    });
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setEditFormClickHandler(this._callback.editClick);
   }
 
   setFormSubmitHandler(callback) {
@@ -205,5 +239,44 @@ export default class EditingEventForm extends AbstractView {
   setEditFormClickHandler(callback) {
     this._callback.editClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
+  }
+
+  reset(point) {
+    this.updateData(EditingEventForm.parsePointToData(point));
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelectorAll('input[name=event-type]')
+      .forEach((element) => {
+        element.addEventListener('click', this._tripTypeChangeHandler);
+      });
+
+    this.getElement()
+      .querySelector('input[name=event-destination]')
+      .addEventListener('change', this._tripDestinationChangeHandler);
+    this.getElement().querySelector(`#event-type-${this._data.type}-1`).checked = true;
+  }
+
+  static parsePointToData(point) {
+    return Object.assign(
+      {},
+      point,
+      {
+        isOffers: point.offers.length > 0,
+        isDestinationDescription: point.destination.description !== '',
+        isDestinationPictures: point.destination.pictures.length > 0,
+      },
+    );
+  }
+
+  static parseDataToPoint(data) {
+    data = Object.assign({}, data);
+
+    delete data.isOffers;
+    delete data.isDestinationDescription;
+    delete data.isDestinationPictures;
+
+    return data;
   }
 }

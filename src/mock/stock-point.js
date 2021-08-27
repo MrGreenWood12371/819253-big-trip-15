@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-export const stockTask = {
+export const stockPoint = {
   'destination' : {
     'description': 'It could be a description',
     'name': 'Moscow',
