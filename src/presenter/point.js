@@ -84,6 +84,7 @@ export default class Point {
   _escKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      this._editingEventFormComponent.reset(this._tripPoint);
       this._replaceFormToCard();
     }
   }
@@ -102,9 +103,11 @@ export default class Point {
 
   _handleEditButtonClick() {
     this._replaceCardToForm();
+    this._editingEventFormComponent.reset(this._tripPoint);
   }
 
-  _handleFormSubmit() {
+  _handleFormSubmit(point) {
+    this._changeData(point);
     this._replaceFormToCard();
   }
 }

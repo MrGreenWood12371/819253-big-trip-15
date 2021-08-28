@@ -40,22 +40,50 @@ const generateDestinationName = () => {
   return destinations[getRandomInteger(0, destinations.length - 1)];
 };
 
-export const generateDestination = () => ({
-  'description': generateDestinationDescription(),
-  'name': generateDestinationName(),
-  'pictures': [
-    {
-      'src': `http://picsum.photos/300/200?r=${Math.random()}`,
-      'description': generateDestinationDescription(),
-    },
-    {
-      'src': `http://picsum.photos/300/200?r=${Math.random()}`,
-      'description': generateDestinationDescription(),
-    },
-    {
-      'src': `http://picsum.photos/300/200?r=${Math.random()}`,
-      'description': generateDestinationDescription(),
-    },
-  ],
-});
+const generateDestinationDescriptionList = () => {
+  const destinations = [
+    'Chamonix',
+    'Geneva',
+    'Amsterdam',
+    'Moscow',
+    'Naryan-Mar',
+    'Vladivostok',
+    'Paris',
+    'Los Angeles',
+    'San Francisco',
+  ];
+
+  const destinationsList = {};
+
+  destinations.forEach((el) => {
+    destinationsList[el] = generateDestinationDescription();
+  });
+  return destinationsList;
+};
+
+const destinationDescriptionList = generateDestinationDescriptionList();
+
+export const generateDestination = (name) => {
+  const destinationName = name || generateDestinationName();
+  const destinationDescription = destinationDescriptionList[destinationName];
+
+  return {
+    'description': destinationDescription,
+    'name': destinationName,
+    'pictures': [
+      {
+        'src': `http://picsum.photos/300/200?r=${Math.random()}`,
+        'description': generateDestinationDescription(),
+      },
+      {
+        'src': `http://picsum.photos/300/200?r=${Math.random()}`,
+        'description': generateDestinationDescription(),
+      },
+      {
+        'src': `http://picsum.photos/300/200?r=${Math.random()}`,
+        'description': generateDestinationDescription(),
+      },
+    ],
+  };
+};
 
