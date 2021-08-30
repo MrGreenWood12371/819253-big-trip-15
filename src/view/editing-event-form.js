@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import SmartView from './smart';
 import { generateDestination } from '../mock/destination';
-import { generateTripOffer } from '../mock/trip-offers';
 import { stockPoint } from '../mock/stock-point';
 import flatpickr from 'flatpickr';
 
@@ -31,11 +30,17 @@ const generatePointPriceTemplate = (basePrice) => (
 </div>`
 );
 
-const generateOffersTemplate = (offers, isOffers) => {
+const generateOffersTemplate = (offers, isOffers, checkedOffers) => {
   let offersTemplate = '';
+  const getCheckedOffer = (offer) => {
+    if (checkedOffers) {
+      return checkedOffers.find((el) => el.name === offer.name) !== undefined ? 'checked' : '';
+    }
+    return '';
+  };
   for (let i = 0; i < offers.length; i++) {
     offersTemplate += `<div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offers[i].name}-1" type="checkbox" name="event-offer-${offers[i].name}">
+    <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offers[i].name}-1" data-offer-name="${offers[i].name}" ${getCheckedOffer(offers[i])} type="checkbox" name="event-offer-${offers[i].name}">
     <label class="event__offer-label" for="event-offer-${offers[i].name}-1">
       <span class="event__offer-title">${offers[i].title}</span>
       &plus;&euro;&nbsp;
@@ -93,6 +98,7 @@ const createEditingEventFormTemplate = (data) => {
     isOffers,
     isDestinationDescription,
     isDestinationPictures,
+    checkedOffers,
   } = data;
 
   return `<li class="trip-events__item">
@@ -175,7 +181,7 @@ const createEditingEventFormTemplate = (data) => {
       </button>
     </header>
     <section class="event__details">
-    ${generateOffersTemplate(offers, isOffers)}
+    ${generateOffersTemplate(offers, isOffers, checkedOffers)}
     ${generateDestinationTemplate(destination, isDestinationDescription, isDestinationPictures)}
     </section>
   </form>
@@ -183,11 +189,13 @@ const createEditingEventFormTemplate = (data) => {
 };
 
 export default class EditingEventForm extends SmartView {
-  constructor(tripPoint = stockPoint) {
+  constructor(tripPoint = stockPoint, tripOffers) {
     super();
     this._data = EditingEventForm.parsePointToData(tripPoint);
     this._startDatepicker = null;
     this._endDatepicker = null;
+    this._tripOffers = tripOffers;
+    this._checkedOffers = tripPoint.checkedOffers || [];
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._editClickHandler = this._editClickHandler.bind(this);
@@ -195,6 +203,7 @@ export default class EditingEventForm extends SmartView {
     this._tripDestinationChangeHandler = this._tripDestinationChangeHandler.bind(this);
     this._dateFromChangeHandler = this._dateFromChangeHandler.bind(this);
     this._dateToChangeHandler = this._dateToChangeHandler.bind(this);
+    this._offerCheckHandler = this._offerCheckHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepickers();
@@ -216,7 +225,7 @@ export default class EditingEventForm extends SmartView {
 
   _tripTypeChangeHandler(evt) {
     evt.preventDefault();
-    const newOffers = generateTripOffer().filter((item) => item.type === evt.target.value)[0].offers;
+    const newOffers = this._tripOffers.slice().find((el) => el.type === evt.target.value).offers;
 
     this.updateData({
       type: evt.target.value,
@@ -248,6 +257,21 @@ export default class EditingEventForm extends SmartView {
         dateTo: userDate,
       },
       true,
+    );
+  }
+
+  _offerCheckHandler (evt) {
+    evt.preventDefault();
+    if (this._checkedOffers.find((el) => el.name === evt.target.dataset.offerName) !== undefined) {
+      this._checkedOffers.splice(this._checkedOffers.findIndex((el) => el.name === evt.target.dataset.offerName), 1);
+    }
+    else{
+      this._checkedOffers.push(this._data.offers.find((el) => el.name === evt.target.dataset.offerName));
+    }
+    this.updateData(
+      {
+        checkedOffers: this._checkedOffers,
+      },
     );
   }
 
@@ -319,6 +343,10 @@ export default class EditingEventForm extends SmartView {
       .querySelector('input[name=event-destination]')
       .addEventListener('change', this._tripDestinationChangeHandler);
     this.getElement().querySelector(`#event-type-${this._data.type}-1`).checked = true;
+
+    this.getElement().querySelectorAll('.event__offer-checkbox').forEach((el) => {
+      el.addEventListener('click', this._offerCheckHandler);
+    });
   }
 
   static parsePointToData(point) {

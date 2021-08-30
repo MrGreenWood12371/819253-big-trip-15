@@ -1,8 +1,20 @@
 import dayjs from 'dayjs';
 import AbstractView from './abstract';
 
+const generateCheckedOffersTemplate = (offers) => {
+  let checkedOffersTemplate = '';
+  offers.forEach((el) => {
+    checkedOffersTemplate += `<li class="event__offer">
+    <span class="event__offer-title">${el.title}</span>
+    &plus;&euro;&nbsp;
+    <span class="event__offer-price">${el.price}</span>
+  </li>`;
+  });
+  return checkedOffersTemplate;
+};
+
 const createTripPointTemplate = (tripPoint) => {
-  const {destination, type, basePrice, isFavorite, dateTo, dateFrom} = tripPoint;
+  const {destination, type, basePrice, isFavorite, dateTo, dateFrom, checkedOffers = []} = tripPoint;
 
   return `<li class="trip-events__item">
   <div class="event">
@@ -24,11 +36,7 @@ const createTripPointTemplate = (tripPoint) => {
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-      <li class="event__offer">
-        <span class="event__offer-title">Order Uber</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">20</span>
-      </li>
+      ${generateCheckedOffersTemplate(checkedOffers)}
     </ul>
     <button class="event__favorite-btn ${isFavorite ? 'event__favorite-btn--active' : ''}" type="button">
       <span class="visually-hidden">Add to favorite</span>

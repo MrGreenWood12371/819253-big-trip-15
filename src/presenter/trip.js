@@ -32,8 +32,9 @@ export default class Trip {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
-  init(tripPoints, infoElement) {
+  init(tripPoints, infoElement, tripOffers) {
     this._tripPoints = tripPoints.slice().sort(sortTripPointByDay);
+    this._tripOffers = tripOffers;
     this._defaultTripPoints = tripPoints.slice().sort(sortTripPointByDay);
     this._TripPriceComponent = new TripPriceView(this._tripPoints);
     this._TripRoadInfoComponent = new TripRoadInfoView(this._tripPoints);
@@ -87,7 +88,7 @@ export default class Trip {
   }
 
   _renderTripPoint(tripPoint) {
-    const pointPresenter = new PointPresenter(this._eventsComponent, this._handleTripPointChange, this._handleModeChange);
+    const pointPresenter = new PointPresenter(this._eventsComponent, this._handleTripPointChange, this._handleModeChange, this._tripOffers);
     pointPresenter.init(tripPoint);
     this._pointPresenter.set(tripPoint.id, pointPresenter);
   }

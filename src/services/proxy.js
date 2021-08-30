@@ -1,6 +1,6 @@
 import AbstractDataService from './abstract-data-service';
 import MockDataService from './mock';
-import ServerDataService from './server';
+// import ServerDataService from './server';
 
 const DataRequestStrategy = {
   Mock: 'mock',
@@ -9,7 +9,7 @@ const DataRequestStrategy = {
 
 const dataRequestStrategies = {
   [DataRequestStrategy.Mock]: new MockDataService(),
-  [DataRequestStrategy.Server]: new ServerDataService(),
+  // [DataRequestStrategy.Server]: new ServerDataService(),
 };
 
 export default class Proxy extends AbstractDataService {
@@ -19,6 +19,14 @@ export default class Proxy extends AbstractDataService {
   }
 
   getTripPoints() {
-    this._dataService.getTripPoints();
+    return this._dataService.getTripPoints();
+  }
+
+  getOffers() {
+    return this._dataService.getOffers();
+  }
+
+  getDestinations() {
+    this._dataService.getDestinations();
   }
 }
