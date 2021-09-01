@@ -1,12 +1,12 @@
 import SiteNavigationView from './view/site-navigation';
 import TripFilteringFormView from './view/fitering-form';
-import { generateTripPoint } from './mock/trip-point';
 import { render, RenderPosition } from './utils/render';
+import ProxyDataService from './services/proxy';
 import TripPresenter from './presenter/trip';
 
-const POINTS_COUNT = 20;
+const proxyDataService = new ProxyDataService('mock');
 
-const tripPoints = new Array(POINTS_COUNT).fill().map(generateTripPoint);
+const tripPoints = proxyDataService.getTripPoints();
 
 const siteHeaderElement = document.querySelector('.trip-main');
 const siteHeaderConstrols = siteHeaderElement.querySelector('.trip-controls');
@@ -19,4 +19,4 @@ render(siteFilter, new TripFilteringFormView(), RenderPosition.BEFOREEND);
 
 const mainContainer = document.querySelector('.page-main').querySelector('.page-body__container');
 const tripPresenter = new TripPresenter(mainContainer);
-tripPresenter.init(tripPoints, siteHeaderElement);
+tripPresenter.init(tripPoints, siteHeaderElement, proxyDataService.getOffers());

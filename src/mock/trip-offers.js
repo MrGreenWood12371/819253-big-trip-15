@@ -12,13 +12,13 @@ const tripOffersList = [
 ];
 
 const generateOffersTemplate = () => {
-  const offersTemplates = [];
+  const offersTemplates = new Set;
   const offersCount = getRandomInteger(0, 5);
 
   for (let i = 0; i < offersCount; i++) {
-    offersTemplates.push(tripOffersList[getRandomInteger(0, tripOffersList.length-1)]);
+    offersTemplates.add(tripOffersList[getRandomInteger(0, tripOffersList.length-1)]);
   }
-  return offersTemplates;
+  return [...offersTemplates];
 };
 
 export const generateTripOffer = () => {
